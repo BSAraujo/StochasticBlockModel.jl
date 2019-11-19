@@ -1,5 +1,5 @@
 
-function generateSBM(probability_matrix::Array{Float64,2}, n_per_community::Array{Int,2};
+function generate(probability_matrix::Array{Float64,2}, n_per_community::Array{Int,2};
                             distribution::String="poisson", seed::Any=nothing)
     """
     Generates a graph from the Stochastic Block Model (Poisson version).

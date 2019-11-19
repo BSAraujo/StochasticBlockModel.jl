@@ -2,9 +2,7 @@ module StochasticBlockModel
 
 using Distributions, Random, JuMP
 
-greet() = print("Hello World!")
-
-include("generative_models.jl")
+include("sbm.jl")
 
 export generatePoissonSBM
 
