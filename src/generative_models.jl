@@ -1,7 +1,6 @@
-import Distributions
-import Random
 
-function generatePoissonSBM(probability_matrix::Array{Float64,2}, n_per_community::Array{Int64,2}; seed::Any=nothing)
+function generateSBM(probability_matrix::Array{Float64,2}, n_per_community::Array{Int,2};
+                            distribution::String="poisson", seed::Any=nothing)
     """
     Generates a graph from the Stochastic Block Model (Poisson version).
 
@@ -11,6 +10,8 @@ function generatePoissonSBM(probability_matrix::Array{Float64,2}, n_per_communit
         Matrix of expected number of edges under Poisson distribution.
     n_per_community : Array{Int64,2}
         Number of nodes in each community.
+    distribution : String
+        Distribution to be used for generating edges (either "poisson" or "bernoulli").
     seed : Any
         Seed for the random number generator.
 
@@ -19,6 +20,11 @@ function generatePoissonSBM(probability_matrix::Array{Float64,2}, n_per_communit
     adj_matrix : Array{Int64,2}
         Adjacency matrix of the generated graph
     """
+
+    # Check input argument 'distribution'
+    if ~(distribution in ["poisson","bernoulli"])
+        throw(string("Invalid distribution: ", distribution))
+    end
     # Set the random seed if one was provided
     if seed != nothing
         Random.seed!(seed)
@@ -31,11 +37,20 @@ function generatePoissonSBM(probability_matrix::Array{Float64,2}, n_per_communit
     for i=1:n_vertices
         for j=1:i
             proba = probability_matrix[community_labels[i], community_labels[j]];
-            if i == j
-                proba = proba / 2 # "The factor of half is included solely because it makes the algebra easier"
+            if distribution == "poisson"
+                if i == j
+                    proba = proba / 2 # "The factor of half is included solely because it makes the algebra easier"
+                end
+                pois = Distributions.Poisson(proba);
+                adj_matrix[i,j] = rand(pois);
+            elseif distribution == "bernoulli"
+                if i == j
+                    adj_matrix[i,j] = 0;
+                else
+                    bernoulli = Bernoulli(proba);
+                    adj_matrix[i,j] = rand(bernoulli);
+                end
             end
-            pois = Distributions.Poisson(proba);
-            adj_matrix[i,j] = rand(pois);
         end
     end
     # "We have adopted the common convention that a self-edge is represented by A[i,j] = 2
