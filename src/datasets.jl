@@ -27,8 +27,8 @@ struct Dataset
     end
 
     function Dataset(A::Matrix{Int}, n::Int, m::Int, q::Int, k::Vector{Int})
-        if (A != A')
-            throw(ArgumentError("Adjacency matrix must be symmetric."))
+        if any(A .< 0)
+            throw(DomainError("Adjacency matrix A must have only non-negative integer elements."))
         end
         if (size(A,1) != n)
             throw(ArgumentError("The size of the adjacency matrix A must match the specified number of nodes n=$n"))
@@ -36,8 +36,8 @@ struct Dataset
         if (sum(A)/2 != m)
             throw(ArgumentError("Number of edges in adjacency matrix A does not match the specified value of m=$m."))
         end
-        if any(A .< 0)
-            throw(DomainError("Adjacency matrix A must have only non-negative integer elements."))
+        if (A != A')
+            throw(ArgumentError("Adjacency matrix must be symmetric."))
         end
         if q <= 0
             throw(DomainError("Number of communities/clusters q must be a positive integer value."))
