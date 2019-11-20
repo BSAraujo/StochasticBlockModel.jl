@@ -23,8 +23,19 @@ function generate(probability_matrix::Array{Float64,2}, n_per_community::Array{I
 
     # Check input argument 'distribution'
     if ~(distribution in ["poisson","bernoulli"])
-        throw(string("Invalid distribution: ", distribution))
+        throw(ArgumentError(string("Invalid distribution: ", distribution)))
     end
+    # Check input argument 'n_per_community'
+    if any(n_per_community .<= 0)
+        throw(DomainError(string("Invalid value in argument n_per_community: ",
+                                 "the number of nodes in each community must be strictly positive.")))
+    end
+    # Check input argument 'probability_matrix'
+    if any(probability_matrix .< 0)
+        throw(DomainError(string("Invalid value in argument probability_matrix: ",
+                                 "the probability values must be strictly positive.")))
+    end
+
     # Set the random seed if one was provided
     if seed != nothing
         Random.seed!(seed)
