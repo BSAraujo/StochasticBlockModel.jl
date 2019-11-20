@@ -3,7 +3,8 @@ module StochasticBlockModel
 using Distributions, Random, JuMP
 
 include("sbm.jl")
+include("datasets.jl")
 
-export generatePoissonSBM
+export generate
 
 end # module
