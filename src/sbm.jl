@@ -33,7 +33,7 @@ struct SBM
     end
 end
 
-function generate(sbm::SBM, n_per_community::Vector{Int}, seed::Any=nothing)::Matrix{Int}
+function generate(sbm::SBM, n_per_community::Vector{Int}, seed::Any=nothing)::Dataset
     """
     Generates a graph from the Stochastic Block Model.
 
@@ -93,12 +93,14 @@ function generate(sbm::SBM, n_per_community::Vector{Int}, seed::Any=nothing)::Ma
     # (and not 1 as one might at first imagine)"
     adj_matrix += transpose(adj_matrix) #- Diagonal(adj_matrix)
 
-    # Return adjacency matrix
-    return adj_matrix
+    # Instantiate a dataset
+    n_communities = length(n_per_community)
+    dataset = Dataset(adj_matrix, n_communities)
+    return dataset
 end
 
 function generate(probability_matrix::Matrix{Float64}, n_per_community::Vector{Int};
-                            distribution::String="poisson", seed::Any=nothing)::Matrix{Int}
+                            distribution::String="poisson", seed::Any=nothing)::Dataset
     """
     Generates a graph from the Stochastic Block Model.
 
