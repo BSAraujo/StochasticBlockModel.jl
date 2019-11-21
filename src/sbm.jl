@@ -117,8 +117,8 @@ function generate(probability_matrix::Matrix{Float64}, n_per_community::Vector{I
 
     Returns
     -------
-    adj_matrix : Matrix{Int}
-        Adjacency matrix of the generated graph
+    dataset : Dataset
+        Dataset representing a graph.
     """
     sbm = SBM(probability_matrix, distribution)
     return generate(sbm, n_per_community, seed)
