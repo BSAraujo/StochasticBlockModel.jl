@@ -27,21 +27,12 @@ function calculateObjective(dataset::Dataset, w::Matrix{Float64}, x::Matrix{Int}
     end
     # Calculate objective value
     L = 0
-    for g=1:q, h=1:q, i=1:n, j=i+1:n
+    for g=1:q, h=1:q, i=1:n, j=1:n
         if x[i,g] * x[j,h] == 1
             if A[i,j] != 0
-                L += (- A[i,j]*log(w[g,h]) + ((k[i]*k[j])/(2*m)) * w[g,h])
+                L += 0.5*(- A[i,j]*log(w[g,h]) + ((k[i]*k[j])/(2*m)) * w[g,h])
             else
-                L += ( ((k[i]*k[j])/(2*m)) * w[g,h] )
-            end
-        end
-    end
-    for g=1:q, i=1:n
-        if x[i,g] == 1
-            if A[i,i] != 0
-                L += 0.5 * ( - A[i,i]*log(w[g,g]) + ((k[i]^2)/(2*m)) * w[g,g] )
-            else
-                L += ( 0.5 * ((k[i]^2)/(2*m)) * w[g,g] )
+                L += 0.5*( ((k[i]*k[j])/(2*m)) * w[g,h] )
             end
         end
     end

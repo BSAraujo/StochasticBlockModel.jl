@@ -5,6 +5,7 @@ version = "0.1.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
@@ -13,8 +14,8 @@ JuMP = "0.18"
 julia = "1"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test","SafeTestsets"]
+test = ["Test", "SafeTestsets"]
