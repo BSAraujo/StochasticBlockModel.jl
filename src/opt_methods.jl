@@ -63,7 +63,7 @@ function calculateObjective(dataset::Dataset, w::Matrix{Float64}, x::Matrix{Int}
     q = dataset.n_communities
     k = dataset.k
     if ~((n,q) == size(x))
-        throw("The dimensions of the assignment matrix do not match the dimensions of the dataset.")
+        throw(ArgumentError("The dimensions of the assignment matrix do not match the dimensions of the dataset."))
     end
     # Calculate objective value
     L = 0
@@ -102,7 +102,7 @@ function optimalProbMatrix(dataset::Dataset, x::Matrix{Int})::Matrix{Float64}
     q = dataset.n_communities
     k = dataset.k
     if ~((n,q) == size(x))
-        throw("The dimensions of the assignment matrix do not match the dimensions of the dataset.")
+        throw(ArgumentError("The dimensions of the assignment matrix do not match the dimensions of the dataset."))
     end
 
     w = zeros(q,q)

@@ -36,4 +36,9 @@ using Test
     @test_throws ArgumentError StochasticBlockModel.Dataset(Matrix([2 1; 1 0]), 2, 4, 2, [3; 1])
     @test_throws DomainError StochasticBlockModel.Dataset(Matrix([-2 1; 1 0]), 2, 2, 2, [3; 1])
     @test_throws DomainError StochasticBlockModel.Dataset(Matrix([2 1; 1 0]), 2, 2, -2, [3; 1])
+
+    A = [0 1 1;
+         0 0 0;
+         0 0 0]
+    @test_throws ArgumentError StochasticBlockModel.Dataset(A, 3, 1, 1, [0; 1; 1])
 end

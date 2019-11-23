@@ -12,6 +12,7 @@ using Test
     @test_throws ArgumentError StochasticBlockModel.SBM([1.0 0; 0 1; 9 1], "poisson")
     @test_throws DomainError StochasticBlockModel.SBM([1.0 0; 0 -1], "bernoulli")
     @test_throws DomainError StochasticBlockModel.SBM([1.0 0; 0 1.2], "bernoulli")
+    @test_throws ArgumentError StochasticBlockModel.SBM([1.0 0; 0.2 0.5], "bernoulli")
 end
 
 @testset "Generate graphs" begin

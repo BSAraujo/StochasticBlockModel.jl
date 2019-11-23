@@ -66,6 +66,10 @@ end
     w = StochasticBlockModel.optimalProbMatrix(dataset, x)
     @test StochasticBlockModel.calculateObjective(dataset, w, x) ≈ 1.830100963204603 rtol = 1e-5
 
+    x = [1 0; 1 0; 1 0; 0 1; 1 0]
+    @test_throws ArgumentError StochasticBlockModel.optimalProbMatrix(dataset, x)
+    @test_throws ArgumentError StochasticBlockModel.calculateObjective(dataset, w, x)
+
     # Graph with self edges
     A = [2 1 0 0;
          1 2 0 0;
