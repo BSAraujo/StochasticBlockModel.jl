@@ -29,7 +29,7 @@ end
 
 
 
-function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Union{Nothing,Matrix{Float64}}, x::Matrix{Int}; start::Union{Nothing,Float64}=nothing)
+function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Union{Nothing,Matrix{Float64}}, x::Matrix{Int}; time_limit::Float64=400.0)
     """ Local Search in the space of the assignments x,
     by looking for the best relocate move.
     The value of w (probability matrix) is fixed and
@@ -58,16 +58,13 @@ function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Unio
     m = dataset.m
     q = dataset.n_communities
     k = dataset.k
-    timeLimit = opt_method.time_limit
 
     # Check if a matrix w was given
     if w == nothing
         w = optimalProbMatrix(dataset, x)
     end
 
-    if start == nothing # check if the time counter has started before this function call
-        start = time(); # Start counting time
-    end
+    start = time(); # Start counting time
 
     # Calculate and store initial objective value
     obj_value = calculateObjective(dataset, w, x)
@@ -79,7 +76,7 @@ function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Unio
     while improved
         improved = false
         # Break if time limit is exceeded
-        if time() - start > timeLimit
+        if time() - start > time_limit
             status = :UserLimit
             break
         end
@@ -171,37 +168,48 @@ function localSearch1(opt_method::OptMethod, dataset::Dataset)
     start = time(); # Start counting time
 
     # Initialize with random assignments
-    x = randomAssignments(dataset)
+    x = randomAssignments(dataset, seed=opt_method.seed)
     w = optimalProbMatrix(dataset, x)
 
     # Calculate objective value
     obj_value = calculateObjective(dataset, w, x)
     best_obj = obj_value
 
+    status = nothing
     iterations = 0
     improved = true
-    while improved
+    while true
+        ## Base cases
+        # Break if there is no improvement
+        if ~improved
+            status = :LocalOptimum_LS1
+            break
+        end
         improved = false
+
         # Break if time limit is exceeded
         availableTime = timeLimit - (time() - start)
         if availableTime <= 0
             status = :UserLimit
             break
         end
+
         # Local Search on the space of assignments
         x = localSearchAssignments(opt_method, dataset, w, x,
-                                   start=start)
+                                   time_limit=availableTime)
         # Update w with optimal value
         w = optimalProbMatrix(dataset, x)
+
         # Evaluate move
         obj_value = calculateObjective(dataset, w, x)
+
+        # Check if there was an improvement
         if obj_value < best_obj
             best_obj = obj_value
             improved = true
         end
         iterations += 1
     end
-    status = :LocalOptimum_LS1
     solvetime = time() - start;
 
     # SBM
@@ -210,9 +218,9 @@ function localSearch1(opt_method::OptMethod, dataset::Dataset)
     # Build OptResults
     obj_lb = -Inf
     obj_ub = obj_value
-    nodecount = 0
-    println("Solvetime: $solvetime")
-    opt_results = OptResults(obj_lb, obj_ub, status, solvetime, iterations, nodecount, 0)
+    nodecount = nothing
+    lazycount = nothing
+    opt_results = OptResults(obj_lb, obj_ub, status, solvetime, iterations, nodecount, lazycount)
     if opt_method.verbose
         display(opt_results)
     end
@@ -221,9 +229,31 @@ end
 
 
 function localSearch2(opt_method::OptMethod, dataset::Dataset)
-    throw("not implemented")
-end
+    """ Local Search 2
+    Initialization with random assignments x.
+    This local search heuristic works in
+    a solution representation-decoder scheme
+    The local search (i.e. the search for improving moves) is done
+    in the space of assignments x. However, whenever a solution
+    is to be evaluated the complete solution is first retrieved,
+    by finding the optimal value of w analytically.
 
-function localSearch3(opt_method::OptMethod, dataset::Dataset)
+    Parameters
+    ----------
+    opt_method : OptMethod
+        Optimization method specifications.
+    dataset : Dataset
+        Dataset representing an observed graph.
+
+
+    Returns
+    -------
+    sbm : SBM
+        Stochastic Block Model
+    x : Array{Int64,2}
+        Matrix of assignments of nodes to groups
+    opt_results : OptResults
+        Results of the optimization process
+    """
     throw("not implemented")
 end

@@ -1,11 +1,12 @@
 struct OptMethod
-    exact::Bool             # Whether the method is exact, i.e. returns a global optimum
-    method::String          # Name of the method
-    time_limit::Float64     # Time limit in seconds
-    verbose::Bool           # Verbose
-    accept_early::Bool      # Specific option for local search 1
+    exact::Bool                 # Whether the method is exact, i.e. returns a global optimum
+    method::String              # Name of the method
+    time_limit::Float64         # Time limit in seconds
+    verbose::Bool               # Verbose
+    seed::Union{Nothing,Int}    # Random seed (for assignments initialization)
+    accept_early::Bool          # Specific option for local search 1
 
-    function OptMethod(method::String, time_limit::Float64, verbose::Bool, accept_early::Bool)
+    function OptMethod(method::String, time_limit::Float64, verbose::Bool, seed::Union{Nothing,Int}, accept_early::Bool)
         if ~(method in ["ls1","ls2","ls3","exact"])
             throw(ArgumentError("Invalid method: $method."))
         end
@@ -17,7 +18,12 @@ struct OptMethod
         else
             exact = false
         end
-        return new(exact, method, time_limit, verbose, accept_early)
+        return new(exact, method, time_limit, verbose, seed, accept_early)
+    end
+
+    function OptMethod(method::String, time_limit::Float64, verbose::Bool, accept_early::Bool)
+        seed = nothing
+        return OptMethod(method, time_limit, verbose, seed, accept_early)
     end
 end
 

@@ -1,4 +1,8 @@
-function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit=400, verbose=false)
+function optimalAssignments(opt_method::OptMethod, dataset::Dataset, sbm::SBM; time_limit::Float64=400.0)
+    return optimalAssignments(dataset, sbm, time_limit=time_limit, verbose=opt_method.verbose)
+end
+
+function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.0, verbose::Bool=false)
     """
     Solves the SBM optimization problem with its descriptive formulation,
     given the matrix of probabilities w.
