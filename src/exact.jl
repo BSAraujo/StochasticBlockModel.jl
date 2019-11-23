@@ -1,5 +1,5 @@
-function optimalAssignments(opt_method::OptMethod, dataset::Dataset, sbm::SBM; time_limit::Float64=400.0)
-    return optimalAssignments(dataset, sbm, time_limit=time_limit, verbose=opt_method.verbose)
+function optimalAssignments(estimator::Estimator, dataset::Dataset, sbm::SBM; time_limit::Float64=400.0)
+    return optimalAssignments(dataset, sbm, time_limit=time_limit, verbose=estimator.verbose)
 end
 
 function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.0, verbose::Bool=false)
@@ -88,6 +88,6 @@ function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.
 end
 
 
-function MINLP(opt_method::OptMethod, dataset::Dataset)
+function MINLP(estimator::Estimator, dataset::Dataset)
     throw("not implemented")
 end

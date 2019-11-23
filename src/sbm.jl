@@ -126,7 +126,7 @@ end
 
 
 function estimate(dataset::Dataset; method::String="ls1", time_limit::Float64=400)::Tuple{SBM, Matrix{Int},OptResults}
-    opt_method = OptMethod(method, time_limit, false, true)
-    sbm, x, opt_results = run(opt_method, dataset)
+    estimator = Estimator(method, time_limit, false, true)
+    sbm, x, opt_results = run(estimator, dataset)
     return sbm, x, opt_results
 end

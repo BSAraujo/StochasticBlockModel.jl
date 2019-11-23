@@ -29,7 +29,7 @@ end
 
 
 
-function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Union{Nothing,Matrix{Float64}}, x::Matrix{Int}; time_limit::Float64=400.0)
+function localSearchAssignments(estimator::Estimator, dataset::Dataset, w::Union{Nothing,Matrix{Float64}}, x::Matrix{Int}; time_limit::Float64=400.0)
     """ Local Search in the space of the assignments x,
     by looking for the best relocate move.
     The value of w (probability matrix) is fixed and
@@ -37,7 +37,7 @@ function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Unio
 
     Parameters
     ----------
-    opt_method : OptMethod
+    estimator : Estimator
         Optimization method specifications.
     dataset : Dataset
         Dataset representing an observed graph.
@@ -81,7 +81,7 @@ function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Unio
             break
         end
         iteration += 1
-        if opt_method.verbose
+        if estimator.verbose
             println("iteration=$iteration")
         end
         # loop through all nodes
@@ -90,7 +90,7 @@ function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Unio
             current_assign = argmax(x[i,:])
             for g=1:(q-1) # Find the best relocate move for node i
                 loop_start = time() # Record loop start time
-                if opt_method.verbose
+                if estimator.verbose
                     print("i=$i; g=$g; ")
                 end
                 new_assign = (current_assign + g)
@@ -116,11 +116,11 @@ function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Unio
                 x[i,new_assign] = 0
 
                 loop_time = time() - loop_start # loop time
-                if opt_method.verbose
+                if estimator.verbose
                     println("loop time=$loop_time")
                 end
 
-                if improved && opt_method.accept_early
+                if improved && estimator.accept_early
                     break
                 end
             end
@@ -137,7 +137,7 @@ function localSearchAssignments(opt_method::OptMethod, dataset::Dataset, w::Unio
 end
 
 
-function localSearch1(opt_method::OptMethod, dataset::Dataset)
+function localSearch1(estimator::Estimator, dataset::Dataset)
     """ Local Search 1
     Initialization with random assignments x.
     This local search heuristic works in two steps:
@@ -149,7 +149,7 @@ function localSearch1(opt_method::OptMethod, dataset::Dataset)
 
     Parameters
     ----------
-    opt_method : OptMethod
+    estimator : Estimator
         Optimization method specifications.
     dataset : Dataset
         Dataset representing an observed graph.
@@ -163,12 +163,12 @@ function localSearch1(opt_method::OptMethod, dataset::Dataset)
     opt_results : OptResults
         Results of the optimization process
     """
-    timeLimit = opt_method.time_limit
+    timeLimit = estimator.time_limit
 
     start = time(); # Start counting time
 
     # Initialize with random assignments
-    x = randomAssignments(dataset, seed=opt_method.seed)
+    x = randomAssignments(dataset, seed=estimator.seed)
     w = optimalProbMatrix(dataset, x)
 
     # Calculate objective value
@@ -195,7 +195,7 @@ function localSearch1(opt_method::OptMethod, dataset::Dataset)
         end
 
         # Local Search on the space of assignments
-        x = localSearchAssignments(opt_method, dataset, w, x,
+        x = localSearchAssignments(estimator, dataset, w, x,
                                    time_limit=availableTime)
         # Update w with optimal value
         w = optimalProbMatrix(dataset, x)
@@ -221,14 +221,14 @@ function localSearch1(opt_method::OptMethod, dataset::Dataset)
     nodecount = nothing
     lazycount = nothing
     opt_results = OptResults(obj_lb, obj_ub, status, solvetime, iterations, nodecount, lazycount)
-    if opt_method.verbose
+    if estimator.verbose
         display(opt_results)
     end
     return sbm, x, opt_results
 end
 
 
-function localSearch2(opt_method::OptMethod, dataset::Dataset)
+function localSearch2(estimator::Estimator, dataset::Dataset)
     """ Local Search 2
     Initialization with random assignments x.
     This local search heuristic works in
@@ -240,7 +240,7 @@ function localSearch2(opt_method::OptMethod, dataset::Dataset)
 
     Parameters
     ----------
-    opt_method : OptMethod
+    estimator : Estimator
         Optimization method specifications.
     dataset : Dataset
         Dataset representing an observed graph.
