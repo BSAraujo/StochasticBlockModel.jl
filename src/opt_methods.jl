@@ -1,3 +1,37 @@
+struct OptMethod
+    exact::Bool             # Whether the method is exact, i.e. returns a global optimum
+    method::String          # Name of the method
+    time_limit::Float64     # Time limit in seconds
+    verbose::Bool           # Verbose
+    accept_early::Bool      # Specific option for local search 1
+
+    function OptMethod(method::String, time_limit::Float64, verbose::Bool, accept_early::Bool)
+        if ~(method in ["ls1","ls2","ls3","exact"])
+            throw(ArgumentError("Invalid method: $method."))
+        end
+        if time_limit <= 0
+            throw(DomainError("Time limit must be a positive value (in seconds)."))
+        end
+        if method == "exact"
+            exact = true
+        else
+            exact = false
+        end
+        return new(exact, method, time_limit, verbose, accept_early)
+    end
+end
+
+function run(opt_method::OptMethod, dataset::Dataset)::OptResults
+    if opt_method.method == "ls1"
+        return LocalSearch1(opt_method, dataset)
+    elseif opt_method.method == "ls2"
+        return LocalSearch2(opt_method, dataset)
+    elseif opt_method.method == "ls3"
+        return LocalSearch3(opt_method, dataset)
+    elseif opt_method.method == "exact"
+        return MINLP(opt_method, dataset)
+    end
+end
 
 
 function calculateObjective(dataset::Dataset, w::Matrix{Float64}, x::Matrix{Int})::Float64

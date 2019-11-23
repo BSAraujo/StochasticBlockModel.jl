@@ -33,7 +33,7 @@ struct SBM
     end
 end
 
-function generate(sbm::SBM, n_per_community::Vector{Int}, seed::Any=nothing)::Dataset
+function generate(sbm::SBM, n_per_community::Vector{Int}, seed::Union{Nothing,Int}=nothing)::Dataset
     """
     Generates a graph from the Stochastic Block Model.
 
@@ -43,7 +43,7 @@ function generate(sbm::SBM, n_per_community::Vector{Int}, seed::Any=nothing)::Da
         An SBM structure.
     n_per_community : Vector{Int}
         Number of nodes in each community.
-    seed : Any
+    seed : Union{Nothing,Int}
         Seed for the random number generator.
 
     Returns
@@ -100,7 +100,7 @@ function generate(sbm::SBM, n_per_community::Vector{Int}, seed::Any=nothing)::Da
 end
 
 function generate(probability_matrix::Matrix{Float64}, n_per_community::Vector{Int};
-                            distribution::String="poisson", seed::Any=nothing)::Dataset
+                            distribution::String="poisson", seed::Union{Nothing, Int}=nothing)::Dataset
     """
     Generates a graph from the Stochastic Block Model.
 
@@ -112,7 +112,7 @@ function generate(probability_matrix::Matrix{Float64}, n_per_community::Vector{I
         Number of nodes in each community.
     distribution : String
         Distribution to be used for generating edges (either "poisson" or "bernoulli").
-    seed : Any
+    seed : Union{Nothing,Int}
         Seed for the random number generator.
 
     Returns
@@ -122,4 +122,11 @@ function generate(probability_matrix::Matrix{Float64}, n_per_community::Vector{I
     """
     sbm = SBM(probability_matrix, distribution)
     return generate(sbm, n_per_community, seed)
+end
+
+
+function estimate(dataset::Dataset; method::String="ls1", time_limit::Float64=400)::Tuple{SBM, Matrix{Int},OptResults}
+    opt_method = OptMethod(method, time_limit, false, true)
+    sbm, x, opt_results = run(opt_method, dataset)
+    return sbm, x, opt_results
 end

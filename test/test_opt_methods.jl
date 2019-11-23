@@ -1,6 +1,21 @@
 using StochasticBlockModel
 using Test
 
+@testset "OptMethod struct" begin
+    opt_method = StochasticBlockModel.OptMethod("ls1", 10.0, true, false)
+    @test opt_method.exact == false
+    opt_method = StochasticBlockModel.OptMethod("ls2", 10.0, true, false)
+    @test opt_method.exact == false
+    opt_method = StochasticBlockModel.OptMethod("ls3", 10.0, true, false)
+    @test opt_method.exact == false
+    opt_method = StochasticBlockModel.OptMethod("exact", 10.0, true, false)
+    @test opt_method.exact == true
+
+    @test_throws ArgumentError StochasticBlockModel.OptMethod("xxx", 10.0, true, false)
+    @test_throws DomainError StochasticBlockModel.OptMethod("ls1", 0.0, true, false)
+    @test_throws DomainError StochasticBlockModel.OptMethod("ls1", -10.0, true, false)
+end
+
 @testset "Calculate objective" begin
     A = [0 1 1 0 0 0 0 0;
          1 0 0 1 0 0 0 0;

@@ -1,12 +1,13 @@
 module StochasticBlockModel
 
-using Distributions, Random, JuMP, Gurobi
+using Distributions, Random, JuMP, GLPKMathProgInterface
 
-include("sbm.jl")
 include("datasets.jl")
+include("sbm.jl")
 include("opt_methods.jl")
 include("results.jl")
 include("exact.jl")
+include("heuristic.jl")
 
 export generate
 

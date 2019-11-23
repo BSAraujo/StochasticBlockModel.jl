@@ -1,4 +1,4 @@
-function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit=400, verbose=true)
+function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit=400, verbose=false)
     """
     Solves the SBM optimization problem with its descriptive formulation,
     given the matrix of probabilities w.
@@ -39,37 +39,51 @@ function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit=400, verbose=
     end
 
     ############################
-    model = Model(solver=GurobiSolver(TimeLimit=time_limit, OutputFlag=verbose)) # version 0.18 of JuMP
+    # TODO: set time limit and verbose options
+    model = Model(solver=GLPKSolverMIP()) # version 0.18 of JuMP
 
     # Variables
+    @variable(model, 0 <= y[1:n,1:n,1:q,1:q] <= 1)
     @variable(model, x[1:n,1:q], Bin);
 
     # Objective
     @objective(model, Min, sum(
-            (W[i,j,g,h] * x[i,g] * x[j,h] )
+            (W[i,j,g,h] * y[i,j,g,h])
             for g=1:q, h=1:q, i=1:n, j=1:n));
 
     # Constraints
+    @constraint(model, con1[i=1:n, j=1:n, g=1:q, h=1:q], x[i,g] - y[i,j,g,h] >= 0)
+    @constraint(model, con2[i=1:n, j=1:n, g=1:q, h=1:q], x[j,h] - y[i,j,g,h] >= 0)
+    @constraint(model, con3[i=1:n, j=1:n, g=1:q, h=1:q], 1 - x[i,g] - x[j,h] + y[i,j,g,h] >= 0)
+
     # Assignment constraints
-    @constraint(model, con[i = 1:n], sum(x[i,g] for g=1:q) == 1); # assignment constraint
+    @constraint(model, assign[i = 1:n], sum(x[i,g] for g=1:q) == 1); # assignment constraint
 
     # Symmetry breaking constraints
     @constraint(model, conObj1, x[1,1] == 1); # object 1 must be in cluster 1
     @constraint(model, conObj[j=2:n], (1 - x[j,2]) <= sum((1 - x[i,1]) for i=2:(j-1)) + x[j,1] ) # if objects 2,...,j-1 are in cluster 1 and object j is not, then object j must be in cluster 2
 
     # Solve
+    start = time()
     status = solve(model) # version 0.18 of JuMP
-    solvetime = getsolvetime(model)
+    solvetime = time() - start
     obj_lb = getobjectivebound(model);
     obj_ub = getobjectivevalue(model);
-    nodecount = getnodecount(model)
+    iterations = nothing
+    nodecount = nothing
+    lazycount = nothing
     ############################
     # Recover variable values
     x_opt = getvalue(x)
 
-    opt_results = OptResults(obj_lb, obj_ub, status, solvetime, 0, nodecount, 0)
+    opt_results = OptResults(obj_lb, obj_ub, status, solvetime, iterations, nodecount, lazycount)
     if verbose
         display(opt_results)
     end
-    return opt_results
+    return opt_results, x_opt
+end
+
+
+function MINLP(opt_method::OptMethod, dataset::Dataset)
+    throw("not implemented")
 end
