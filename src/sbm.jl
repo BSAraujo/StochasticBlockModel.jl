@@ -14,7 +14,7 @@ struct SBM
             throw(DomainError("All elements in matrix of probabilities w must be strictly positive."))
         end
         # Check if matrix is symmetric
-        if w != w'
+        if ~(w ≈ w')
             throw(ArgumentError("Matrix w must be symmetric."))
         end
         q = size(w,1)
