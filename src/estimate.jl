@@ -1,4 +1,5 @@
-struct Estimator
+
+struct SBMEstimator
     exact::Bool                 # Whether the method is exact, i.e. returns a global optimum
     method::String              # Name of the method
     time_limit::Float64         # Time limit in seconds
@@ -6,7 +7,7 @@ struct Estimator
     seed::Union{Nothing,Int}    # Random seed (for assignments initialization)
     accept_early::Bool          # Specific option for local search 1
 
-    function Estimator(method::String, time_limit::Float64, verbose::Bool, seed::Union{Nothing,Int}, accept_early::Bool)
+    function SBMEstimator(method::String, time_limit::Float64, verbose::Bool, seed::Union{Nothing,Int}, accept_early::Bool)
         if ~(method in ["ls1","ls2","ls3","exact"])
             throw(ArgumentError("Invalid method: $method."))
         end
@@ -21,19 +22,24 @@ struct Estimator
         return new(exact, method, time_limit, verbose, seed, accept_early)
     end
 
-    function Estimator(method::String, time_limit::Float64, verbose::Bool, accept_early::Bool)
+    function SBMEstimator(method::String, time_limit::Float64, verbose::Bool, accept_early::Bool)
         seed = nothing
-        return Estimator(method, time_limit, verbose, seed, accept_early)
+        return SBMEstimator(method, time_limit, verbose, seed, accept_early)
     end
 end
 
-function run(estimator::Estimator, dataset::Dataset)::OptResults
+include("local_search1.jl")
+include("local_search2.jl")
+include("local_search3.jl")
+
+
+function run(estimator::SBMEstimator, dataset::Dataset)::Tuple{SBM, Matrix{Int}, OptResults}
     if estimator.method == "ls1"
-        return LocalSearch1(estimator, dataset)
+        return localSearch1(estimator, dataset)
     elseif estimator.method == "ls2"
-        return LocalSearch2(estimator, dataset)
+        return localSearch2(estimator, dataset)
     elseif estimator.method == "ls3"
-        return LocalSearch3(estimator, dataset)
+        return localSearch3(estimator, dataset)
     elseif estimator.method == "exact"
         return MINLP(estimator, dataset)
     end
@@ -116,4 +122,19 @@ function optimalProbMatrix(dataset::Dataset, x::Matrix{Int})::Matrix{Float64}
         end
     end
     return w
+end
+
+
+function estimate(dataset::Dataset; method::String="ls1", time_limit::Float64=400.0, verbose::Bool=false)::Tuple{SBM, Matrix{Int}, OptResults}
+    estimator = SBMEstimator(method, time_limit, verbose, true)
+    sbm, x, opt_results = run(estimator, dataset)
+    return sbm, x, opt_results
+end
+
+
+function estimate(A::Matrix{Int}, q::Int; method::String="ls1", time_limit::Float64=400.0, verbose::Bool=false)::Tuple{SBM, Matrix{Int}, OptResults}
+    dataset = Dataset(A, q)
+    estimator = SBMEstimator(method, time_limit, verbose, true)
+    sbm, x, opt_results = run(estimator, dataset)
+    return sbm, x, opt_results
 end

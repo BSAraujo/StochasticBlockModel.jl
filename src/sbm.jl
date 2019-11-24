@@ -2,9 +2,10 @@ struct SBM
     w::Matrix{Float64}      # Matrix of probabilities
     dist::String            # Distribution (either "poisson" or "bernoulli")
     n_communities::Int      # Number of communities/clusters
+    variant::String
 
     # Constructor function for struct SBM
-    function SBM(w::Matrix{Float64}, dist::String)
+    function SBM(w::Matrix{Float64}, dist::String, variant::String)
         # Check if w is a square matrix
         if size(w,1) != size(w,2)
             throw(ArgumentError("Matrix w must be a square matrix."))
@@ -29,7 +30,15 @@ struct SBM
                 throw(DomainError("When using a bernoulli distribution all elements in matrix of probabilities w must be between 0 and 1."))
             end
         end
-        return new(w, dist, q)
+        if ~(variant in ["standard","degree-corrected"])
+            throw(ArgumentError("Invalid SBM variant: $variant"))
+        end
+        return new(w, dist, q, variant)
+    end
+
+    function SBM(w::Matrix{Float64}, dist::String)
+        variant = "standard"
+        return SBM(w, dist, variant)
     end
 end
 
@@ -51,6 +60,10 @@ function generate(sbm::SBM, n_per_community::Vector{Int}, seed::Union{Nothing,In
     adj_matrix : Matrix{Int}
         Adjacency matrix of the generated graph
     """
+    if sbm.variant != "standard"
+        throw("not implemented")
+    end
+
     # Check input argument 'n_per_community'
     if any(n_per_community .<= 0)
         throw(DomainError(string("Invalid value in argument n_per_community: ",
@@ -122,11 +135,4 @@ function generate(probability_matrix::Matrix{Float64}, n_per_community::Vector{I
     """
     sbm = SBM(probability_matrix, distribution)
     return generate(sbm, n_per_community, seed)
-end
-
-
-function estimate(dataset::Dataset; method::String="ls1", time_limit::Float64=400)::Tuple{SBM, Matrix{Int},OptResults}
-    estimator = Estimator(method, time_limit, false, true)
-    sbm, x, opt_results = run(estimator, dataset)
-    return sbm, x, opt_results
 end

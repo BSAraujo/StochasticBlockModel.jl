@@ -20,7 +20,7 @@ using Test
     @test opt_results.LB ≈ 2.4548225555204373 rtol = 1e-5
     @test opt_results.status == :Optimal
 
-    estimator = StochasticBlockModel.Estimator("ls1", 10.0, true, 1, false)
+    estimator = StochasticBlockModel.SBMEstimator("ls1", 10.0, true, 1, false)
     sbm = StochasticBlockModel.SBM([1.3 0.2; 0.2 0.8], "poisson")
     opt_results1, x1 = StochasticBlockModel.optimalAssignments(estimator, dataset, sbm)
     opt_results2, x2 = StochasticBlockModel.optimalAssignments(dataset, sbm, verbose=true)

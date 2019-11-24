@@ -1,5 +1,5 @@
 
-function localSearch3(estimator::Estimator, dataset::Dataset)
+function localSearch3(estimator::SBMEstimator, dataset::Dataset)::Tuple{SBM, Matrix{Int}, OptResults}
     """ Local Search 3
     1. Initialize with random assignments;
     2. Solve analytically for the optimal probability matrix w;
@@ -8,7 +8,7 @@ function localSearch3(estimator::Estimator, dataset::Dataset)
 
     Parameters
     ----------
-    estimator : Estimator
+    estimator : SBMEstimator
         Optimization method specifications.
     dataset : Dataset
         Dataset representing an observed graph.
@@ -56,8 +56,11 @@ function localSearch3(estimator::Estimator, dataset::Dataset)
 
         # Optimal Assignments
         sbm = SBM(w, "poisson")
-        assignment_results, x = optimalAssignments(dataset, sbm, time_limit=availableTime,
-                                                   verbose=estimator.verbose)
+        assignment_results, x_opt = optimalAssignments(dataset, sbm, time_limit=availableTime,
+                                                       verbose=estimator.verbose)
+        if assignment_results.status == :Optimal
+            x = x_opt
+        end
 
         # Update w with optimal value
         w = optimalProbMatrix(dataset, x)

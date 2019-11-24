@@ -31,7 +31,7 @@ end
          0 0 0 0 0 1 1 0]
     dataset = StochasticBlockModel.Dataset(A, 2)
     x = StochasticBlockModel.randomAssignments(dataset, seed=1)
-    estimator = StochasticBlockModel.Estimator("ls1", 10.0, false, 0, false)
+    estimator = StochasticBlockModel.SBMEstimator("ls1", 10.0, false, 0, false)
     w = StochasticBlockModel.optimalProbMatrix(dataset, x)
     obj_before = StochasticBlockModel.calculateObjective(dataset, w, x)
     # Run local search
@@ -55,19 +55,19 @@ end
          0 0 0 0 1 0 0 1;
          0 0 0 0 0 1 1 0]
     dataset = StochasticBlockModel.Dataset(A, 2)
-    estimator = StochasticBlockModel.Estimator("ls1", 10.0, false, 0, false)
+    estimator = StochasticBlockModel.SBMEstimator("ls1", 10.0, false, 0, false)
     sbm, x, opt_results = StochasticBlockModel.localSearch1(estimator, dataset)
     @test opt_results.UB ≈ 2.454822555520437 rtol = 1e-5
     @test opt_results.LB == -Inf
 
-    estimator = StochasticBlockModel.Estimator("ls2", 10.0, false, 0, false)
+    estimator = StochasticBlockModel.SBMEstimator("ls2", 10.0, false, 0, false)
     sbm, x, opt_results = StochasticBlockModel.localSearch2(estimator, dataset)
     @test opt_results.UB ≈ 2.454822555520437 rtol = 1e-5
     @test opt_results.LB == -Inf
 
 
     dataset = StochasticBlockModel.Dataset("../instances/zachary.in")
-    estimator = StochasticBlockModel.Estimator("ls1", 10.0, false, 0, false)
+    estimator = StochasticBlockModel.SBMEstimator("ls1", 10.0, false, 0, false)
     sbm, x, opt_results = StochasticBlockModel.localSearch1(estimator, dataset)
     time_ls1 = opt_results.solvetime
     @test opt_results.UB ≈ 67.88545219325196 rtol = 1e-5
@@ -75,7 +75,7 @@ end
     @test opt_results.status == :LocalOptimum_LS1
     @test sbm.w ≈ [0.57483 1.49603; 1.49603 0.421296] rtol = 1e-5
 
-    estimator = StochasticBlockModel.Estimator("ls2", 10.0, false, 0, false)
+    estimator = StochasticBlockModel.SBMEstimator("ls2", 10.0, false, 0, false)
     sbm, x, opt_results = StochasticBlockModel.localSearch2(estimator, dataset)
     @test opt_results.UB ≈ 63.973982362428586 rtol = 1e-5
     @test opt_results.LB == -Inf
@@ -97,7 +97,7 @@ end
          0 0 0 0 1 0 0 1;
          0 0 0 0 0 1 1 0]
     dataset = StochasticBlockModel.Dataset(A, 2)
-    estimator = StochasticBlockModel.Estimator("ls2", 10.0, false, 0, false)
+    estimator = StochasticBlockModel.SBMEstimator("ls2", 10.0, false, 0, false)
     sbm, x, opt_results = StochasticBlockModel.localSearch2(estimator, dataset)
     @test opt_results.UB ≈ 2.454822555520437 rtol = 1e-5
     @test opt_results.LB == -Inf

@@ -1,19 +1,19 @@
 using StochasticBlockModel
 using Test
 
-@testset "Estimator struct" begin
-    estimator = StochasticBlockModel.Estimator("ls1", 10.0, true, false)
+@testset "SBMEstimator struct" begin
+    estimator = StochasticBlockModel.SBMEstimator("ls1", 10.0, true, false)
     @test estimator.exact == false
-    estimator = StochasticBlockModel.Estimator("ls2", 10.0, true, false)
+    estimator = StochasticBlockModel.SBMEstimator("ls2", 10.0, true, false)
     @test estimator.exact == false
-    estimator = StochasticBlockModel.Estimator("ls3", 10.0, true, false)
+    estimator = StochasticBlockModel.SBMEstimator("ls3", 10.0, true, false)
     @test estimator.exact == false
-    estimator = StochasticBlockModel.Estimator("exact", 10.0, true, false)
+    estimator = StochasticBlockModel.SBMEstimator("exact", 10.0, true, false)
     @test estimator.exact == true
 
-    @test_throws ArgumentError StochasticBlockModel.Estimator("xxx", 10.0, true, false)
-    @test_throws DomainError StochasticBlockModel.Estimator("ls1", 0.0, true, false)
-    @test_throws DomainError StochasticBlockModel.Estimator("ls1", -10.0, true, false)
+    @test_throws ArgumentError StochasticBlockModel.SBMEstimator("xxx", 10.0, true, false)
+    @test_throws DomainError StochasticBlockModel.SBMEstimator("ls1", 0.0, true, false)
+    @test_throws DomainError StochasticBlockModel.SBMEstimator("ls1", -10.0, true, false)
 end
 
 @testset "Calculate objective" begin

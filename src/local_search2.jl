@@ -1,17 +1,17 @@
 
-function localSearch2(estimator::Estimator, dataset::Dataset)
+function localSearch2(estimator::SBMEstimator, dataset::Dataset)::Tuple{SBM, Matrix{Int}, OptResults}
     """ Local Search 2
     Initialization with random assignments x.
-    This local search heuristic works in 
+    This local search heuristic works in
     a solution representation-decoder scheme
-    The local search (i.e. the search for improving moves) is done 
+    The local search (i.e. the search for improving moves) is done
     in the space of assignments x. However, whenever a solution
-    is to be evaluated the complete solution is first retrieved, 
+    is to be evaluated the complete solution is first retrieved,
     by finding the optimal value of w analytically.
 
     Parameters
     ----------
-    estimator : Estimator
+    estimator : SBMEstimator
         Optimization method specifications.
     dataset : Dataset
         Dataset representing an observed graph.
@@ -32,11 +32,11 @@ function localSearch2(estimator::Estimator, dataset::Dataset)
     timeLimit = estimator.time_limit
 
     start = time(); # Start counting time
-    
+
     # Initialize with random assignments
     x = randomAssignments(dataset, seed=estimator.seed)
     w = optimalProbMatrix(dataset, x)
-    
+
     # Calculate objective value
     obj_value = calculateObjective(dataset, w, x)
     best_solution = (copy(w), copy(x))
@@ -54,7 +54,7 @@ function localSearch2(estimator::Estimator, dataset::Dataset)
             break
         end
         improved = false
-        
+
         # Break if time limit is exceeded
         availableTime = timeLimit - (time() - start)
         if availableTime <= 0
@@ -62,7 +62,7 @@ function localSearch2(estimator::Estimator, dataset::Dataset)
             break
         end
         iterations += 1
-        
+
         # Find improving relocation move
         improved, best_obj, w, x = findImprovingRelocation(dataset, w, x, true, best_imp=true)
     end
@@ -83,4 +83,3 @@ function localSearch2(estimator::Estimator, dataset::Dataset)
 
     return sbm, x, opt_results
 end
-

@@ -28,8 +28,8 @@ function randomAssignments(dataset::Dataset; seed::Union{Nothing, Int}=nothing):
 end
 
 
-function findImprovingRelocation(dataset::Dataset, w::Matrix{Float64}, x::Matrix{Int}, 
-                                 reeval_w::Bool; best_imp::Bool=false)
+function findImprovingRelocation(dataset::Dataset, w::Matrix{Float64}, x::Matrix{Int},
+                                 reeval_w::Bool; best_imp::Bool=true)
     """
     Parameters
     ----------
@@ -44,6 +44,9 @@ function findImprovingRelocation(dataset::Dataset, w::Matrix{Float64}, x::Matrix
     best_imp : Bool
         Whether to take the best possible improving move (true) or to take the first improving move (false).
     """
+    if best_imp == false
+        throw("not implemented")
+    end
     n = dataset.n
     q = dataset.n_communities
 
@@ -57,18 +60,18 @@ function findImprovingRelocation(dataset::Dataset, w::Matrix{Float64}, x::Matrix
         # Get current assignment of node i
         current_assign = argmax(x[i,:])
         for g=1:(q-1) # Find the best relocate move for node i
-            new_assign = (current_assign + g) 
+            new_assign = (current_assign + g)
             if new_assign > q
                 new_assign = new_assign % q
             end
-            
+
             # Reassign move
             x[i,current_assign] = 0
             x[i,new_assign] = 1
-            
+
             # Evaluate move
             if reeval_w ##### Evaluate move on corresponding optimal w
-                w = optimalProbMatrix(dataset, x) 
+                w = optimalProbMatrix(dataset, x)
             end
             #####
             obj_value = calculateObjective(dataset, w, x)
@@ -92,7 +95,7 @@ end
 
 
 
-function localSearchAssignments(estimator::Estimator, dataset::Dataset, w::Union{Nothing,Matrix{Float64}}, x::Matrix{Int}; time_limit::Float64=400.0)
+function localSearchAssignments(estimator::SBMEstimator, dataset::Dataset, w::Union{Nothing,Matrix{Float64}}, x::Matrix{Int}; time_limit::Float64=400.0)
     """ Local Search in the space of the assignments x,
     by looking for the best relocate move.
     The value of w (probability matrix) is fixed and
@@ -100,7 +103,7 @@ function localSearchAssignments(estimator::Estimator, dataset::Dataset, w::Union
 
     Parameters
     ----------
-    estimator : Estimator
+    estimator : SBMEstimator
         Optimization method specifications.
     dataset : Dataset
         Dataset representing an observed graph.
@@ -123,7 +126,7 @@ function localSearchAssignments(estimator::Estimator, dataset::Dataset, w::Union
     end
 
     start = time(); # Start counting time
-    
+
     improved = true
     while improved
         improved = false
@@ -135,6 +138,3 @@ function localSearchAssignments(estimator::Estimator, dataset::Dataset, w::Union
     end
     return x
 end
-
-
-

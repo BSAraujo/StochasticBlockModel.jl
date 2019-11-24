@@ -1,8 +1,8 @@
-function optimalAssignments(estimator::Estimator, dataset::Dataset, sbm::SBM; time_limit::Float64=400.0)
+function optimalAssignments(estimator::SBMEstimator, dataset::Dataset, sbm::SBM; time_limit::Float64=400.0)::Tuple{OptResults, Matrix{Int}}
     return optimalAssignments(dataset, sbm, time_limit=time_limit, verbose=estimator.verbose)
 end
 
-function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.0, verbose::Bool=false)
+function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.0, verbose::Bool=false)::Tuple{OptResults, Matrix{Int}}
     """
     Solves the SBM optimization problem with its descriptive formulation,
     given the matrix of probabilities w.
@@ -30,7 +30,11 @@ function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.
         println("q = $q groups\nn = $n nodes\nm = $m edges");
         println("w=")
         println(w)
+        println("Time limit: $time_limit seconds")
     end
+
+    # convert from seconds to milli-seconds
+    time_limit = Int(round(time_limit*1000))
 
     w[w .== 0] .= 1e-30
     W = zeros(n,n,q,q);
@@ -44,7 +48,8 @@ function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.
 
     ############################
     # TODO: set time limit and verbose options
-    model = Model(solver=GLPKSolverMIP()) # version 0.18 of JuMP
+    model = Model(solver=GLPKSolverMIP(tm_lim=time_limit)) # version 0.18 of JuMP
+    # model = Model(solver=GLPKSolverMIP()) # version 0.18 of JuMP
 
     # Variables
     @variable(model, 0 <= y[1:n,1:n,1:q,1:q] <= 1)
@@ -78,16 +83,17 @@ function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.
     lazycount = nothing
     ############################
     # Recover variable values
-    x_opt = getvalue(x)
+    x = getvalue(x)
+    x = Int.(round.(x[:,:]))
 
     opt_results = OptResults(obj_lb, obj_ub, status, solvetime, iterations, nodecount, lazycount)
     if verbose
         display(opt_results)
     end
-    return opt_results, x_opt
+    return opt_results, x
 end
 
 
-function MINLP(estimator::Estimator, dataset::Dataset)
+function MINLP(estimator::SBMEstimator, dataset::Dataset)
     throw("not implemented")
 end

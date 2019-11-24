@@ -1,5 +1,5 @@
 
-function localSearch1(estimator::Estimator, dataset::Dataset)
+function localSearch1(estimator::SBMEstimator, dataset::Dataset)::Tuple{SBM, Matrix{Int}, OptResults}
     """ Local Search 1
     Initialization with random assignments x.
     This local search heuristic works in two steps:
@@ -11,7 +11,7 @@ function localSearch1(estimator::Estimator, dataset::Dataset)
 
     Parameters
     ----------
-    estimator : Estimator
+    estimator : SBMEstimator
         Optimization method specifications.
     dataset : Dataset
         Dataset representing an observed graph.
@@ -60,7 +60,7 @@ function localSearch1(estimator::Estimator, dataset::Dataset)
         # Local Search on the space of assignments
         x = localSearchAssignments(estimator, dataset, w, x,
                                    time_limit=availableTime)
-        
+
         # Update w with optimal value
         w = optimalProbMatrix(dataset, x)
 
