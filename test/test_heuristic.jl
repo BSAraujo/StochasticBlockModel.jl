@@ -80,7 +80,7 @@ end
     @test opt_results.UB ≈ 63.973982362428586 rtol = 1e-5
     @test opt_results.LB == -Inf
     @test opt_results.status == :LocalOptimum_LS2
-    @test time_ls1 < opt_results.solvetime
+    # @test time_ls1 < opt_results.solvetime
     @test sbm.w ≈ [0.518201 1.5768; 1.5768 0.309462] rtol = 1e-5
 
 end
