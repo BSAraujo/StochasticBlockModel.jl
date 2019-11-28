@@ -11,11 +11,7 @@ StochasticBlockModel.jl is a Julia package that provides methods for common task
 
 ## Installation
 
-To install this package directly from the repo download it with the command:
-```julia
-julia> Pkg.clone("git://github.com/BSAraujo/StochasticBlockModel.jl.git")
-julia> using StochasticBlockModel
-```
+To install this package, open the Julia REPL and type `]add StochasticBlockModel`.
 
 ## Example Usage
 
