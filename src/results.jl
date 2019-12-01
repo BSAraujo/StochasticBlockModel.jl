@@ -32,7 +32,7 @@ struct OptResults
     end
 end
 
-function display(opt_results::OptResults)
+function displayResults(opt_results::OptResults)
     """
     Method to display optimization results.
 

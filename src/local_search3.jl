@@ -87,7 +87,7 @@ function localSearch3(estimator::SBMEstimator, dataset::Dataset)::Tuple{SBM, Mat
     lazycount = nothing
     opt_results = OptResults(obj_lb, obj_ub, status, solvetime, iterations, nodecount, lazycount)
     if estimator.verbose
-        display(opt_results)
+        displayResults(opt_results)
     end
 
     return sbm, x, opt_results

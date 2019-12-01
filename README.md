@@ -57,7 +57,7 @@ julia> sbm.w
  0.551446  1.59584
  1.59584   0.20851
 
-julia> StochasticBlockModel.display(opt_results)
+julia> StochasticBlockModel.displayResults(opt_results)
 
 --------------- Opt Results ---------------
 Obj. LB = -Inf

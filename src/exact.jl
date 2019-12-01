@@ -49,7 +49,6 @@ function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.
     ############################
     # TODO: set time limit and verbose options
     model = Model(solver=GLPKSolverMIP(tm_lim=time_limit)) # version 0.18 of JuMP
-    # model = Model(solver=GLPKSolverMIP()) # version 0.18 of JuMP
 
     # Variables
     @variable(model, 0 <= y[1:n,1:n,1:q,1:q] <= 1)
@@ -77,18 +76,26 @@ function optimalAssignments(dataset::Dataset, sbm::SBM; time_limit::Float64=400.
     status = solve(model) # version 0.18 of JuMP
     solvetime = time() - start
     obj_lb = getobjectivebound(model);
+    if isnan(obj_lb)
+        obj_lb = -Inf
+    end
     obj_ub = getobjectivevalue(model);
+    if isnan(obj_ub)
+        obj_ub = Inf
+    end
     iterations = nothing
     nodecount = nothing
     lazycount = nothing
     ############################
     # Recover variable values
     x = getvalue(x)
-    x = Int.(round.(x[:,:]))
+    x = round.(x[:,:])
+    x[map(v -> isnan(v) , x)] .= 0 # replace NaN values with 0
+    x = Int.(x)
 
     opt_results = OptResults(obj_lb, obj_ub, status, solvetime, iterations, nodecount, lazycount)
     if verbose
-        display(opt_results)
+        displayResults(opt_results)
     end
     return opt_results, x
 end

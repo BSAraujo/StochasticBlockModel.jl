@@ -29,7 +29,7 @@ end
 
 
 function findImprovingRelocation(dataset::Dataset, w::Matrix{Float64}, x::Matrix{Int},
-                                 reeval_w::Bool; best_imp::Bool=true)
+                                 reeval_w::Bool; best_imp::Bool=true, time_limit::Float64=400.0)
     """
     Parameters
     ----------
@@ -47,6 +47,9 @@ function findImprovingRelocation(dataset::Dataset, w::Matrix{Float64}, x::Matrix
     if best_imp == false
         throw("not implemented")
     end
+
+    start = time(); # Start counting time
+
     n = dataset.n
     q = dataset.n_communities
 
@@ -60,6 +63,15 @@ function findImprovingRelocation(dataset::Dataset, w::Matrix{Float64}, x::Matrix
         # Get current assignment of node i
         current_assign = argmax(x[i,:])
         for g=1:(q-1) # Find the best relocate move for node i
+
+            # Break if time limit is exceeded
+            availableTime = time_limit - (time() - start)
+            if availableTime <= 0
+                (w, x) = best_solution
+                return improved, best_obj, w, x
+            end
+
+            # Set new assignment for node i
             new_assign = (current_assign + g)
             if new_assign > q
                 new_assign = new_assign % q
@@ -131,10 +143,11 @@ function localSearchAssignments(estimator::SBMEstimator, dataset::Dataset, w::Un
     while improved
         improved = false
         # Break if time limit is exceeded
-        if (time() - start) > time_limit
+        availableTime = time_limit - (time() - start)
+        if availableTime <= 0
             break
         end
-        improved, best_obj, w, x = findImprovingRelocation(dataset, w, x, false, best_imp=true)
+        improved, best_obj, w, x = findImprovingRelocation(dataset, w, x, false, best_imp=true, time_limit=availableTime)
     end
     return x
 end

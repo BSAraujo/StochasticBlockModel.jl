@@ -64,7 +64,7 @@ function localSearch2(estimator::SBMEstimator, dataset::Dataset)::Tuple{SBM, Mat
         iterations += 1
 
         # Find improving relocation move
-        improved, best_obj, w, x = findImprovingRelocation(dataset, w, x, true, best_imp=true)
+        improved, best_obj, w, x = findImprovingRelocation(dataset, w, x, true, best_imp=true, time_limit=availableTime)
     end
     solvetime = time() - start;
 
@@ -78,7 +78,7 @@ function localSearch2(estimator::SBMEstimator, dataset::Dataset)::Tuple{SBM, Mat
     lazycount = nothing
     opt_results = OptResults(obj_lb, obj_ub, status, solvetime, iterations, nodecount, lazycount)
     if estimator.verbose
-        display(opt_results)
+        displayResults(opt_results)
     end
 
     return sbm, x, opt_results
