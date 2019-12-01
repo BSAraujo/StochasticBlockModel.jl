@@ -66,7 +66,7 @@ end
     @test opt_results.LB == -Inf
 
 
-    dataset = StochasticBlockModel.Dataset("../instances/zachary.in")
+    dataset = StochasticBlockModel.Dataset("../instances/RW/zachary.in")
     estimator = StochasticBlockModel.SBMEstimator("ls1", 10.0, false, 0, false)
     sbm, x, opt_results = StochasticBlockModel.localSearch1(estimator, dataset)
     time_ls1 = opt_results.solvetime

@@ -59,6 +59,6 @@ function display(opt_results::OptResults)
     print(print_string)
 end
 
-function write(opt_results::OptResults, path::String; oneline::Bool=false, header::Bool=false)
+function saveResults(opt_results::OptResults, path::String; oneline::Bool=false, header::Bool=false)
     throw("not implemented")
 end

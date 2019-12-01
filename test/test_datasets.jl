@@ -16,7 +16,7 @@ using Test
                     0  0  1  0  0  2  1  1
                     0  0  0  1  1  1  0  1
                     0  1  0  0  0  1  1  2]
-    dataset = StochasticBlockModel.Dataset("../instances/g01.in")
+    dataset = StochasticBlockModel.Dataset("../instances/S1/g01.in")
     @test dataset.A == expected_A
     @test dataset.n == 8
     @test dataset.m == 19
@@ -41,4 +41,20 @@ using Test
          0 0 0;
          0 0 0]
     @test_throws ArgumentError StochasticBlockModel.Dataset(A, 3, 1, 1, [0; 1; 1])
+
+
+    # Get a list of all files
+    path = "../instances/S1"
+    for file in readdir(path)
+        filepath = string(path, "/", file)
+        dataset = StochasticBlockModel.Dataset(filepath)
+        StochasticBlockModel.saveDataset(dataset, string(filepath,".test"))
+        dataset_test = StochasticBlockModel.Dataset(string(filepath,".test"))
+        rm(string(filepath,".test"))
+        @test dataset.n == dataset_test.n
+        @test dataset.m == dataset_test.m
+        @test dataset.n_communities == dataset_test.n_communities
+        @test dataset.k == dataset_test.k
+        @test dataset.A == dataset_test.A
+    end
 end

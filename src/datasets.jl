@@ -48,7 +48,7 @@ struct Dataset
 end
 
 
-function loadDataset(dataset_path)
+function loadDataset(dataset_path::String)::Dataset
     lines = readlines(dataset_path)
     n,m,q = map(x->parse(Int,x), split(lines[1],","))
     A = Matrix(zeros(Int,n,n))
@@ -60,4 +60,29 @@ function loadDataset(dataset_path)
     k = vec(sum(A, dims=1)) # get node degree of each node
     dataset = Dataset(A, n, m, q, k)
     return dataset
+end
+
+
+function saveDataset(dataset::Dataset, path::String)
+    firstline = string(join([dataset.n, dataset.m, dataset.n_communities], ","),"\n")
+    open(path, "w") do f
+        # Write fist line to file
+        write(f, firstline)
+        # Write edges as edge list
+        for i=1:dataset.n, j=i:dataset.n
+            n_edges = dataset.A[i,j]
+            if i == j
+                n_edges = Int(n_edges / 2)
+            end
+            for w in 1:n_edges
+                write(f, "$i,$j\n")
+            end
+        end
+    end
+end
+
+
+function loadKarate()
+    dataset_path = "../instances/zachary.in"
+    return Dataset(dataset_path)
 end
