@@ -58,7 +58,10 @@ function localSearch3(estimator::SBMEstimator, dataset::Dataset)::Tuple{SBM, Mat
         sbm = SBM(w, "poisson")
         assignment_results, x_opt = optimalAssignments(dataset, sbm, time_limit=availableTime,
                                                        verbose=estimator.verbose)
-        if assignment_results.status == :Optimal
+        if assignment_results.status == :UserLimit
+            status = :UserLimit
+            break
+        elseif assignment_results.status == :Optimal
             x = x_opt
         end
 
