@@ -17,24 +17,24 @@ end
 
 @testset "Generate graphs" begin
 
-    expected_A = [0  1  2  1  0  0  0  0
+    expected_A =[0  1  2  1  0  0  0  0
                  1  0  1  1  0  0  0  0
                  2  1  0  1  0  0  0  0
                  1  1  1  2  0  0  0  0
-                 0  0  0  0  0  1  2  1
-                 0  0  0  0  1  0  1  1
-                 0  0  0  0  2  1  0  2
-                 0  0  0  0  1  1  2  0]
+                 0  0  0  0  2  0  2  3
+                 0  0  0  0  0  0  0  1
+                 0  0  0  0  2  0  0  1
+                 0  0  0  0  3  1  1  0]
     dataset = StochasticBlockModel.generate([1.0 0.0; 0.0 1.0], [4; 4], seed=2)
     @test dataset.A == expected_A
     @test dataset.n_communities == 2
-
+ 
     expected_A = [0  1  2  0  0  0
                   1  0  1  0  0  0
                   2  1  0  0  0  0
-                  0  0  0  0  1  1
-                  0  0  0  1  0  0
-                  0  0  0  1  0  2]
+                  0  0  0  2  2  2
+                  0  0  0  2  2  0
+                  0  0  0  2  0  0]
     dataset = StochasticBlockModel.generate([1.0 0.0; 0.0 1.0], [3; 3], seed=2)
     @test dataset.A == expected_A
     @test dataset.n_communities == 2
